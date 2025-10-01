@@ -4,8 +4,8 @@ import type React from "react"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Join Your Block - Bulqit",
-  description: "Bulk home services for your neighborhood",
+  title: "Bulqit - Wizard",
+  description: "Wizard for Bulqit",
   generator: "v0.app",
 }
 
