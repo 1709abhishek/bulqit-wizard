@@ -144,6 +144,8 @@ test/
 ```bash
 # .env.local
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_key_here
+GOOGLE_MAPS_API_KEY=your_key_here
+DATABASE_URL=your_db_string_here
 ```
 
 **Note:** The `NEXT_PUBLIC_` prefix exposes the key client-side, which is required for Google Maps JavaScript API. Restrict your API key by HTTP referrer in Google Cloud Console.
