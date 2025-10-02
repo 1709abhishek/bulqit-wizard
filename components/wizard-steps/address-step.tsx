@@ -17,6 +17,9 @@ type ValidationStatus = "idle" | "validating" | "valid" | "invalid"
 
 export function AddressStep({ data, updateData, onNext, onBack }: Props) {
   const [formData, setFormData] = useState({
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
     address: data.address,
     city: data.city || "",
     state: data.state || "",
@@ -144,7 +147,7 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
   }
 
   useEffect(() => {
-    if (!addressInputRef.current || !isScriptLoaded) {
+    if (!addressInputRef.current || !isScriptLoaded || typeof window.google === "undefined") {
       console.log("[v0] Autocomplete not ready:", {
         hasInput: !!addressInputRef.current,
         isScriptLoaded,
@@ -154,6 +157,7 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
     }
 
     console.log("[v0] Initializing Google Places Autocomplete")
+    console.log("addressInputRef", addressInputRef)
 
     try {
       autocompleteRef.current = new window.google.maps.places.Autocomplete(addressInputRef.current, {
@@ -209,12 +213,13 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
 
         const fullAddress = `${streetNumber} ${route}`.trim()
 
-        setFormData({
+        setFormData((prev) => ({
+          ...prev,
           address: fullAddress,
           city,
           state,
           zipCode,
-        })
+        }))
 
         setShowAutocompleteTip(false)
         validateAddress(fullAddress, city, state, zipCode)
@@ -233,7 +238,7 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
 
   const handleChange = (field: keyof typeof formData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
-    if (validationStatus !== "idle") {
+    if (field === "address" && validationStatus !== "idle") {
       setValidationStatus("idle")
       setValidationMessage("")
     }
@@ -244,7 +249,13 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
   }
 
   const handleNext = () => {
-    if (formData.address.trim() && (validationStatus === "valid" || apiError)) {
+    if (
+      formData.firstName.trim() &&
+      formData.lastName.trim() &&
+      formData.email.trim() &&
+      formData.address.trim() &&
+      (validationStatus === "valid" || apiError)
+    ) {
       updateData(formData)
       onNext()
     }
@@ -263,6 +274,13 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
     return null
   }
 
+  const isValid =
+    formData.firstName.trim() &&
+    formData.lastName.trim() &&
+    formData.email.trim() &&
+    formData.address.trim() &&
+    (apiError || validationStatus === "valid")
+
   return (
     <div className="min-h-screen flex flex-col px-6 py-8 md:py-16">
       <button
@@ -280,7 +298,7 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
               {"Where is your home?"}
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              {"Enter your address so we can find your Bulqit Block."}
+              {"Enter your details and address so we can find your Bulqit Block."}
             </p>
           </div>
 
@@ -309,9 +327,7 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
               </div>
             </div>
           )}
-
-          <div className="space-y-4">
-            <div className="space-y-2">
+          <div className="space-y-2">
               <label className="text-sm font-medium text-card-foreground">
                 {"Street Address"} <span className="text-primary">*</span>
               </label>
@@ -344,41 +360,52 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2 md:col-span-2">
-                <label className="text-sm font-medium text-card-foreground">{"City"}</label>
+            <input type="hidden" value={formData.city} />
+            <input type="hidden" value={formData.state} />
+            <input type="hidden" value={formData.zipCode} />
+
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-card-foreground">
+                  {"First Name"} <span className="text-primary">*</span>
+                </label>
                 <Input
                   type="text"
-                  placeholder="Chicago"
-                  value={formData.city}
-                  onChange={(e) => handleChange("city", e.target.value)}
+                  placeholder="John"
+                  value={formData.firstName}
+                  onChange={(e) => handleChange("firstName", e.target.value)}
                   className="h-12 px-4 rounded-xl border-2 border-border focus:border-border-hover bg-card"
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-card-foreground">{"State"}</label>
+                <label className="text-sm font-medium text-card-foreground">
+                  {"Last Name"} <span className="text-primary">*</span>
+                </label>
                 <Input
                   type="text"
-                  placeholder="IL"
-                  value={formData.state}
-                  onChange={(e) => handleChange("state", e.target.value)}
+                  placeholder="Doe"
+                  value={formData.lastName}
+                  onChange={(e) => handleChange("lastName", e.target.value)}
                   className="h-12 px-4 rounded-xl border-2 border-border focus:border-border-hover bg-card"
-                  maxLength={2}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-card-foreground">{"ZIP Code"}</label>
+              <label className="text-sm font-medium text-card-foreground">
+                {"Email"} <span className="text-primary">*</span>
+              </label>
               <Input
-                type="text"
-                placeholder="60607"
-                value={formData.zipCode}
-                onChange={(e) => handleChange("zipCode", e.target.value)}
+                type="email"
+                placeholder="john.doe@example.com"
+                value={formData.email}
+                onChange={(e) => handleChange("email", e.target.value)}
                 className="h-12 px-4 rounded-xl border-2 border-border focus:border-border-hover bg-card"
-                maxLength={10}
               />
             </div>
+
+            
 
             {!apiError && validationStatus === "idle" && formData.address.trim() && (
               <Button
@@ -393,7 +420,7 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
 
             <Button
               onClick={handleNext}
-              disabled={!formData.address.trim() || (!apiError && validationStatus !== "valid")}
+              disabled={!isValid}
               size="lg"
               className="w-full h-14 text-lg font-semibold bg-primary hover:bg-secondary text-primary-foreground rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
             >
