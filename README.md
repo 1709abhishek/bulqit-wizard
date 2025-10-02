@@ -13,7 +13,7 @@
 
 ## Overview
 
-Built for Bulqit's Phase 1 launch, this signup wizard captures homeowner interest in bulk neighborhood services. Designed mobile-first for social media advertising (Facebook/Google ads), with full desktop responsiveness.
+Built for Bulqit - Phase 1 wizard project, this signup wizard captures homeowner interest in bulk neighborhood services. Designed mobile-first for social media advertising (Facebook/Google ads), with full desktop responsiveness.
 
 **Figma Link:** https://www.figma.com/design/OEfmOcyVibLfyUDqzHw1Je/Bulqit-Survey?node-id=0-1&t=aNOrMT1UggPFMGpk-1
 
@@ -165,7 +165,7 @@ npm test              # Run test suite
 npm run test:ui       # Interactive test UI
 ```
 
-**Testing Strategy:** Comprehensive tests have been written to fence future changes and ensure reliability. The test suite covers wizard flows, address validation, form interactions, and accessibility compliance.
+**Testing Strategy:** Comprehensive tests have been written to fence future changes and ensure reliability. The test suite covers few flows.
 
 ### Production
 
