@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { ArrowLeft, Check } from "lucide-react"
 import Image from "next/image"
+import { useState } from "react"
 import type { WizardData } from "../signup-wizard"
 
 type Props = {
@@ -36,6 +37,41 @@ export function FutureServicesStep({ data, updateData, onNext, onBack }: Props) 
 
   const handleNext = () => {
     onNext()
+  }
+
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const isValid = data.firstName && data.lastName && data.email && data.address
+
+  const handleSubmit = async () => {
+    if (!(data.firstName && data.lastName && data.email)) return
+
+    setSubmitting(true)
+    setError(null)
+
+    // Persist to parent state first for consistency
+    updateData(data)
+
+    const payload = { ...data }
+
+    try {
+      const res = await fetch("/api/survey", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body?.error || "Failed to submit")
+      }
+
+      onNext()
+    } catch (e: any) {
+      setError(e?.message || "Something went wrong")
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -91,13 +127,18 @@ export function FutureServicesStep({ data, updateData, onNext, onBack }: Props) 
             })}
           </div>
 
+          {error ? (
+              <p className="text-sm text-red-500">{error}</p>
+          ) : null}
+
           <Button
-            onClick={handleNext}
-            size="lg"
-            className="w-full h-14 text-lg font-semibold bg-primary hover:bg-secondary text-primary-foreground rounded-full transition-all duration-300"
-          >
-            {"Continue"}
-          </Button>
+              onClick={handleSubmit}
+              disabled={!isValid || submitting}
+              size="lg"
+              className="w-full h-14 text-lg font-semibold bg-primary hover:bg-secondary text-primary-foreground rounded-full transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+            >
+              {submitting ? "Submitting..." : "Submit"}
+            </Button>
         </div>
       </div>
     </div>
