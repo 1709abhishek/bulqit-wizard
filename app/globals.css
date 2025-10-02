@@ -163,10 +163,48 @@
     @apply bg-background text-foreground;
   }
 
-  /* Fix Google Places Autocomplete dropdown visibility */
+  /* Enhanced Google Places Autocomplete dropdown styling */
   /* The .pac-container is created by Google Maps and appended to body */
-  /* It needs a high z-index to appear above other elements */
   .pac-container {
     z-index: 10000 !important;
+    margin-top: 4px !important;
+    border-radius: 12px !important;
+    border: 2px solid var(--border) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
+    font-family: var(--font-sans) !important;
+    background-color: var(--card) !important;
+  }
+
+  .pac-item {
+    padding: 12px 16px !important;
+    border-top: 1px solid var(--border) !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    color: var(--foreground) !important;
+  }
+
+  .pac-item:first-child {
+    border-top: none !important;
+  }
+
+  .pac-item:hover,
+  .pac-item-selected {
+    background-color: var(--success-muted) !important;
+  }
+
+  .pac-item-query {
+    font-size: 14px !important;
+    color: var(--foreground) !important;
+    font-weight: 500 !important;
+  }
+
+  .pac-matched {
+    font-weight: 600 !important;
+    color: var(--primary) !important;
+  }
+
+  .pac-icon {
+    display: none !important;
   }
 }

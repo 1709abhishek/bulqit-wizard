@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { AlertCircle, ArrowLeft, CheckCircle2, Loader2 } from "lucide-react"
+import { AlertCircle, ArrowLeft, CheckCircle2, Loader2, MapPin } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import type { WizardData } from "../signup-wizard"
 
@@ -27,6 +27,7 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
   const [validationStatus, setValidationStatus] = useState<ValidationStatus>("idle")
   const [validationMessage, setValidationMessage] = useState("")
   const [isAutocompleteReady, setIsAutocompleteReady] = useState(false)
+  const [showAutocompleteTip, setShowAutocompleteTip] = useState(false)
 
   const addressInputRef = useRef<HTMLInputElement>(null)
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
@@ -143,7 +144,7 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
   }
 
   useEffect(() => {
-    if (!addressInputRef.current || !isScriptLoaded || typeof window.google === "undefined") {
+    if (!addressInputRef.current || !isScriptLoaded) {
       console.log("[v0] Autocomplete not ready:", {
         hasInput: !!addressInputRef.current,
         isScriptLoaded,
@@ -169,10 +170,7 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
         if (pacContainer) {
           console.log("[v0] Autocomplete dropdown container found:", pacContainer)
         } else {
-          console.log("[v0] WARNING: Autocomplete dropdown container (.pac-container) not found")
-          console.log(
-            "[v0] This usually means Places API is not enabled or API key has restrictions. Check Network tab for API errors.",
-          )
+          console.log("[v0] Autocomplete dropdown container will appear when you start typing")
         }
       }, 1000)
 
@@ -218,6 +216,7 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
           zipCode,
         })
 
+        setShowAutocompleteTip(false)
         validateAddress(fullAddress, city, state, zipCode)
       })
     } catch (error) {
@@ -316,9 +315,6 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
               <label className="text-sm font-medium text-card-foreground">
                 {"Street Address"} <span className="text-primary">*</span>
               </label>
-              {isAutocompleteReady && !apiError && (
-                <p className="text-xs text-muted-foreground">{"Start typing to see address suggestions"}</p>
-              )}
               <div className="relative">
                 <Input
                   ref={addressInputRef}
@@ -326,6 +322,8 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
                   placeholder="730 South Loomis Street"
                   value={formData.address}
                   onChange={(e) => handleChange("address", e.target.value)}
+                  onFocus={() => setShowAutocompleteTip(true)}
+                  onBlur={() => setTimeout(() => setShowAutocompleteTip(false), 200)}
                   className="h-12 px-4 pr-12 rounded-xl border-2 border-border focus:border-border-hover bg-card"
                   autoFocus
                 />
@@ -333,6 +331,12 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
                   <ValidationIcon />
                 </div>
               </div>
+              {isAutocompleteReady && showAutocompleteTip && !validationMessage && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <MapPin className="w-4 h-4" />
+                  <span>{"Start typing to see address suggestions"}</span>
+                </div>
+              )}
               {validationMessage && (
                 <p className={`text-sm ${validationStatus === "valid" ? "text-success" : "text-destructive"}`}>
                   {validationMessage}
