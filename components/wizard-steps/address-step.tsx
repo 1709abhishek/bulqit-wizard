@@ -327,42 +327,6 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
               </div>
             </div>
           )}
-          <div className="space-y-2">
-              <label className="text-sm font-medium text-card-foreground">
-                {"Street Address"} <span className="text-primary">*</span>
-              </label>
-              <div className="relative">
-                <Input
-                  ref={addressInputRef}
-                  type="text"
-                  placeholder="730 South Loomis Street"
-                  value={formData.address}
-                  onChange={(e) => handleChange("address", e.target.value)}
-                  onFocus={() => setShowAutocompleteTip(true)}
-                  onBlur={() => setTimeout(() => setShowAutocompleteTip(false), 200)}
-                  className="h-12 px-4 pr-12 rounded-xl border-2 border-border focus:border-border-hover bg-card"
-                  autoFocus
-                />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                  <ValidationIcon />
-                </div>
-              </div>
-              {isAutocompleteReady && showAutocompleteTip && !validationMessage && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="w-4 h-4" />
-                  <span>{"Start typing to see address suggestions"}</span>
-                </div>
-              )}
-              {validationMessage && (
-                <p className={`text-sm ${validationStatus === "valid" ? "text-success" : "text-destructive"}`}>
-                  {validationMessage}
-                </p>
-              )}
-            </div>
-
-            <input type="hidden" value={formData.city} />
-            <input type="hidden" value={formData.state} />
-            <input type="hidden" value={formData.zipCode} />
 
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -405,7 +369,42 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
               />
             </div>
 
-            
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-card-foreground">
+                {"Street Address"} <span className="text-primary">*</span>
+              </label>
+              <div className="relative">
+                <Input
+                  ref={addressInputRef}
+                  type="text"
+                  placeholder="730 South Loomis Street"
+                  value={formData.address}
+                  onChange={(e) => handleChange("address", e.target.value)}
+                  onFocus={() => setShowAutocompleteTip(true)}
+                  onBlur={() => setTimeout(() => setShowAutocompleteTip(false), 200)}
+                  className="h-12 px-4 pr-12 rounded-xl border-2 border-border focus:border-border-hover bg-card"
+                  autoFocus
+                />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                  <ValidationIcon />
+                </div>
+              </div>
+              {isAutocompleteReady && showAutocompleteTip && !validationMessage && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <MapPin className="w-4 h-4" />
+                  <span>{"Start typing to see address suggestions"}</span>
+                </div>
+              )}
+              {validationMessage && (
+                <p className={`text-sm ${validationStatus === "valid" ? "text-success" : "text-destructive"}`}>
+                  {validationMessage}
+                </p>
+              )}
+            </div>
+
+            <input type="hidden" value={formData.city} />
+            <input type="hidden" value={formData.state} />
+            <input type="hidden" value={formData.zipCode} />
 
             {!apiError && validationStatus === "idle" && formData.address.trim() && (
               <Button
