@@ -6,7 +6,6 @@ import { AlertCircle, ArrowLeft, CheckCircle2, Loader2, MapPin } from "lucide-re
 import { useEffect, useRef, useState } from "react"
 import type { WizardData } from "../signup-wizard"
 
-// Add Window typing for gm_authFailure to fix TS error
 declare global {
   interface Window {
     gm_authFailure?: () => void
@@ -38,32 +37,30 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
   const [validationMessage, setValidationMessage] = useState("")
   const [isAutocompleteReady, setIsAutocompleteReady] = useState(false)
   const [showAutocompleteTip, setShowAutocompleteTip] = useState(false)
-    // Email validation state
-    const [emailError, setEmailError] = useState<string>("")
-    const [emailTouched, setEmailTouched] = useState<boolean>(false)
-  
-    const addressInputRef = useRef<HTMLInputElement>(null)
-    const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
-    const geocoderRef = useRef<google.maps.Geocoder | null>(null)
-  
-    // Helper to validate email format
-    const isValidEmail = (email: string) => {
-      // Simple, practical regex for common email formats
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  const [emailError, setEmailError] = useState<string>("")
+  const [emailTouched, setEmailTouched] = useState<boolean>(false)
+  const [isInputMounted, setIsInputMounted] = useState(false)
+
+  const addressInputRef = useRef<HTMLInputElement>(null)
+  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
+  const geocoderRef = useRef<google.maps.Geocoder | null>(null)
+
+  const isValidEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  }
+
+  const validateEmail = (email: string) => {
+    if (!email.trim()) {
+      setEmailError("Email is required")
+      return false
     }
-  
-    const validateEmail = (email: string) => {
-      if (!email.trim()) {
-        setEmailError("Email is required")
-        return false
-      }
-      if (!isValidEmail(email)) {
-        setEmailError("Please enter a valid email address")
-        return false
-      }
-      setEmailError("")
-      return true
+    if (!isValidEmail(email)) {
+      setEmailError("Please enter a valid email address")
+      return false
     }
+    setEmailError("")
+    return true
+  }
 
   useEffect(() => {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
@@ -154,9 +151,10 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
         const location = result[0]
 
         const hasStreetAddress =
-          location.types.includes("street_address") ||
-          location.types.includes("premise") ||
-          location.types.includes("subpremise")
+          location.types &&
+          (location.types.includes("street_address") ||
+            location.types.includes("premise") ||
+            location.types.includes("subpremise"))
 
         if (hasStreetAddress) {
           setValidationStatus("valid")
@@ -186,7 +184,7 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
     }
 
     console.log("[v0] Initializing Google Places Autocomplete")
-    console.log("addressInputRef", addressInputRef)
+    console.log("[v0] Input element:", addressInputRef.current)
 
     try {
       autocompleteRef.current = new window.google.maps.places.Autocomplete(addressInputRef.current, {
@@ -208,7 +206,6 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
       }, 1000)
 
       autocompleteRef.current.addListener("place_changed", () => {
-        console.log("[v0] Place selected from autocomplete")
         const place = autocompleteRef.current?.getPlace()
         if (!place?.address_components) {
           console.log("[v0] No address components in selected place")
@@ -263,7 +260,7 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
         window.google.maps.event.clearInstanceListeners(autocompleteRef.current)
       }
     }
-  }, [isScriptLoaded])
+  }, [isScriptLoaded, isInputMounted])
 
   const handleChange = (field: keyof typeof formData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -366,6 +363,45 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
           )}
 
           <div className="space-y-6">
+            <div className="space-y-2">
+              <label htmlFor="address" className="text-sm font-medium text-card-foreground">
+                {"Street Address"} <span className="text-primary">*</span>
+              </label>
+              <div className="relative">
+                <Input
+                  id="address"
+                  ref={(el) => {
+                    addressInputRef.current = el
+                    if (el && !isInputMounted) {
+                      setIsInputMounted(true)
+                    }
+                  }}
+                  type="text"
+                  placeholder="730 South Loomis Street"
+                  value={formData.address}
+                  onChange={(e) => handleChange("address", e.target.value)}
+                  onFocus={() => setShowAutocompleteTip(true)}
+                  onBlur={() => setTimeout(() => setShowAutocompleteTip(false), 200)}
+                  className="h-12 px-4 pr-12 rounded-xl border-2 border-border focus:border-border-hover bg-card"
+                  autoFocus
+                />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                  <ValidationIcon />
+                </div>
+              </div>
+              {isAutocompleteReady && showAutocompleteTip && !validationMessage && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <MapPin className="w-4 h-4" />
+                  <span>{"Start typing to see address suggestions"}</span>
+                </div>
+              )}
+              {validationMessage && (
+                <p className={`text-sm ${validationStatus === "valid" ? "text-success" : "text-destructive"}`}>
+                  {validationMessage}
+                </p>
+              )}
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label htmlFor="firstName" className="text-sm font-medium text-card-foreground">
@@ -411,43 +447,7 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
                 }}
                 className="h-12 px-4 rounded-xl border-2 border-border focus:border-border-hover bg-card"
               />
-              {emailTouched && emailError && (
-                <p className="text-sm text-destructive">{emailError}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="address" className="text-sm font-medium text-card-foreground">
-                {"Street Address"} <span className="text-primary">*</span>
-              </label>
-              <div className="relative">
-                <Input
-                  id="address"
-                  ref={addressInputRef}
-                  type="text"
-                  placeholder="730 South Loomis Street"
-                  value={formData.address}
-                  onChange={(e) => handleChange("address", e.target.value)}
-                  onFocus={() => setShowAutocompleteTip(true)}
-                  onBlur={() => setTimeout(() => setShowAutocompleteTip(false), 200)}
-                  className="h-12 px-4 pr-12 rounded-xl border-2 border-border focus:border-border-hover bg-card"
-                  autoFocus
-                />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2">
-                  <ValidationIcon />
-                </div>
-              </div>
-              {isAutocompleteReady && showAutocompleteTip && !validationMessage && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="w-4 h-4" />
-                  <span>{"Start typing to see address suggestions"}</span>
-                </div>
-              )}
-              {validationMessage && (
-                <p className={`text-sm ${validationStatus === "valid" ? "text-success" : "text-destructive"}`}>
-                  {validationMessage}
-                </p>
-              )}
+              {emailTouched && emailError && <p className="text-sm text-destructive">{emailError}</p>}
             </div>
 
             <input type="hidden" value={formData.city} />
