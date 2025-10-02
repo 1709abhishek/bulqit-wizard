@@ -15,7 +15,7 @@ export function WelcomeStep({ onNext }: { onNext: () => void }) {
             <br />
             Bulk home services.
           </h1>
-          <p className="text-xl md:text-3xl text-primary font-semibold">{"Just Bulqit!"}</p>
+          <p className="text-xl md:text-3xl text-primary font-semibold italic">{"Just Bulqit!"}</p>
           <p className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto leading-relaxed">
             {"Answer a few questions so we can bring better deals on home services to your neighborhood."}
           </p>
