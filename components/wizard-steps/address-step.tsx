@@ -6,6 +6,13 @@ import { AlertCircle, ArrowLeft, CheckCircle2, Loader2, MapPin } from "lucide-re
 import { useEffect, useRef, useState } from "react"
 import type { WizardData } from "../signup-wizard"
 
+// Add Window typing for gm_authFailure to fix TS error
+declare global {
+  interface Window {
+    gm_authFailure?: () => void
+  }
+}
+
 type Props = {
   data: WizardData
   updateData: (data: Partial<WizardData>) => void
@@ -31,10 +38,32 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
   const [validationMessage, setValidationMessage] = useState("")
   const [isAutocompleteReady, setIsAutocompleteReady] = useState(false)
   const [showAutocompleteTip, setShowAutocompleteTip] = useState(false)
+  // Email validation state
+  const [emailError, setEmailError] = useState<string>("")
+  const [emailTouched, setEmailTouched] = useState<boolean>(false)
 
   const addressInputRef = useRef<HTMLInputElement>(null)
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
   const geocoderRef = useRef<google.maps.Geocoder | null>(null)
+
+  // Helper to validate email format
+  const isValidEmail = (email: string) => {
+    // Simple, practical regex for common email formats
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  }
+
+  const validateEmail = (email: string) => {
+    if (!email.trim()) {
+      setEmailError("Email is required")
+      return false
+    }
+    if (!isValidEmail(email)) {
+      setEmailError("Please enter a valid email address")
+      return false
+    }
+    setEmailError("")
+    return true
+  }
 
   useEffect(() => {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
@@ -242,6 +271,11 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
       setValidationStatus("idle")
       setValidationMessage("")
     }
+    if (field === "email") {
+      if (emailTouched) {
+        validateEmail(value)
+      }
+    }
   }
 
   const handleValidateClick = () => {
@@ -254,7 +288,8 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
       formData.lastName.trim() &&
       formData.email.trim() &&
       formData.address.trim() &&
-      (validationStatus === "valid" || apiError)
+      (validationStatus === "valid" || apiError) &&
+      validateEmail(formData.email)
     ) {
       updateData(formData)
       onNext()
@@ -279,7 +314,9 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
     formData.lastName.trim() &&
     formData.email.trim() &&
     formData.address.trim() &&
-    (apiError || validationStatus === "valid")
+    (apiError || validationStatus === "valid") &&
+    isValidEmail(formData.email) &&
+    !emailError
 
   return (
     <div className="min-h-screen flex flex-col px-6 py-8 md:py-16">
@@ -365,8 +402,15 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
                 placeholder="john.doe@example.com"
                 value={formData.email}
                 onChange={(e) => handleChange("email", e.target.value)}
+                onBlur={() => {
+                  setEmailTouched(true)
+                  validateEmail(formData.email)
+                }}
                 className="h-12 px-4 rounded-xl border-2 border-border focus:border-border-hover bg-card"
               />
+              {emailTouched && emailError && (
+                <p className="text-sm text-destructive">{emailError}</p>
+              )}
             </div>
 
             <div className="space-y-2">

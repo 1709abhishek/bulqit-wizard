@@ -128,7 +128,7 @@ export function FutureServicesStep({ data, updateData, onNext, onBack }: Props) 
           </div>
 
           {error ? (
-              <p className="text-sm text-red-500">{error}</p>
+            <p className="text-sm text-red-500">{error}</p>
           ) : null}
 
           <Button
