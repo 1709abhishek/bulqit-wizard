@@ -25,6 +25,21 @@ Built for Bulqit's Phase 1 launch, this signup wizard captures homeowner interes
 - Completion time: < 2 minutes
 - Mobile conversion optimized: Single-question screens, large touch targets, minimal friction
 
+### Phase 1 - Wizard Site
+
+- ✅ **Step-by-step wizard** - Each screen asks one question and advances smoothly
+- ✅ **Homeowner signup questions** - Mirrors required flow 
+- ✅ **Bulqit branding** - Custom design system with brand colors, typography, and spacing
+- ✅ **Simple, fast, accessible UX** - WCAG 2.1 AA compliant, keyboard navigation, ARIA labels
+- ✅ **Database-ready structure** - Schema designed for Neon PostgreSQL integration
+- ✅ **Production hosting** - Deployable to Vercel with full production experience
+- ✅ **Phase 2 architecture** - Modular codebase structured for clean expansion
+
+### Phase 2 - Future Expansion (Not Yet Implemented)
+
+- **Google lookup feature** - API integration to match addresses with internal block data and give required services.
+- **Neon database integration** - Would need current database connection string
+
 ## Key Features
 
 ### 🏠 Smart Address Collection
