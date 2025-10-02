@@ -1,13 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { WelcomeStep } from "./wizard-steps/welcome-step"
-import { AddressStep } from "./wizard-steps/address-step"
-import { ServicesStep } from "./wizard-steps/services-step"
-import { FutureServicesStep } from "./wizard-steps/future-services-step"
-import { UserDetailsStep } from "./wizard-steps/user-details-step"
-import { ThankYouStep } from "./wizard-steps/thank-you-step"
 import { ProgressIndicator } from "./progress-indicator"
+import { AddressStep } from "./wizard-steps/address-step"
+import { FutureServicesStep } from "./wizard-steps/future-services-step"
+import { ServicesStep } from "./wizard-steps/services-step"
+import { ThankYouStep } from "./wizard-steps/thank-you-step"
+import { WelcomeStep } from "./wizard-steps/welcome-step"
 
 export type WizardData = {
   address: string
@@ -34,7 +33,7 @@ export default function SignupWizard() {
     phone: "",
   })
 
-  const totalSteps = 6
+  const totalSteps = 5
   const showProgress = currentStep > 0 && currentStep < totalSteps - 1
 
   const updateData = (newData: Partial<WizardData>) => {
@@ -58,8 +57,7 @@ export default function SignupWizard() {
     <WelcomeStep key="welcome" onNext={nextStep} />,
     <AddressStep key="address" data={data} updateData={updateData} onNext={nextStep} onBack={prevStep} />,
     <ServicesStep key="services" data={data} updateData={updateData} onNext={nextStep} onBack={prevStep} />,
-    <FutureServicesStep key="future" data={data} updateData={updateData} onNext={nextStep} onBack={prevStep} />,
-    <UserDetailsStep key="details" data={data} updateData={updateData} onNext={handleSubmit} onBack={prevStep} />,
+    <FutureServicesStep key="future" data={data} updateData={updateData} onNext={handleSubmit} onBack={prevStep} />,
     <ThankYouStep key="thankyou" />,
   ]
 
