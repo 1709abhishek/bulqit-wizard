@@ -38,32 +38,32 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
   const [validationMessage, setValidationMessage] = useState("")
   const [isAutocompleteReady, setIsAutocompleteReady] = useState(false)
   const [showAutocompleteTip, setShowAutocompleteTip] = useState(false)
-  // Email validation state
-  const [emailError, setEmailError] = useState<string>("")
-  const [emailTouched, setEmailTouched] = useState<boolean>(false)
-
-  const addressInputRef = useRef<HTMLInputElement>(null)
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
-  const geocoderRef = useRef<google.maps.Geocoder | null>(null)
-
-  // Helper to validate email format
-  const isValidEmail = (email: string) => {
-    // Simple, practical regex for common email formats
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-  }
-
-  const validateEmail = (email: string) => {
-    if (!email.trim()) {
-      setEmailError("Email is required")
-      return false
+    // Email validation state
+    const [emailError, setEmailError] = useState<string>("")
+    const [emailTouched, setEmailTouched] = useState<boolean>(false)
+  
+    const addressInputRef = useRef<HTMLInputElement>(null)
+    const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
+    const geocoderRef = useRef<google.maps.Geocoder | null>(null)
+  
+    // Helper to validate email format
+    const isValidEmail = (email: string) => {
+      // Simple, practical regex for common email formats
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
     }
-    if (!isValidEmail(email)) {
-      setEmailError("Please enter a valid email address")
-      return false
+  
+    const validateEmail = (email: string) => {
+      if (!email.trim()) {
+        setEmailError("Email is required")
+        return false
+      }
+      if (!isValidEmail(email)) {
+        setEmailError("Please enter a valid email address")
+        return false
+      }
+      setEmailError("")
+      return true
     }
-    setEmailError("")
-    return true
-  }
 
   useEffect(() => {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
@@ -368,10 +368,11 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-card-foreground">
+                <label htmlFor="firstName" className="text-sm font-medium text-card-foreground">
                   {"First Name"} <span className="text-primary">*</span>
                 </label>
                 <Input
+                  id="firstName"
                   type="text"
                   placeholder="John"
                   value={formData.firstName}
@@ -380,10 +381,11 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-card-foreground">
+                <label htmlFor="lastName" className="text-sm font-medium text-card-foreground">
                   {"Last Name"} <span className="text-primary">*</span>
                 </label>
                 <Input
+                  id="lastName"
                   type="text"
                   placeholder="Doe"
                   value={formData.lastName}
@@ -394,10 +396,11 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-card-foreground">
+              <label htmlFor="email" className="text-sm font-medium text-card-foreground">
                 {"Email"} <span className="text-primary">*</span>
               </label>
               <Input
+                id="email"
                 type="email"
                 placeholder="john.doe@example.com"
                 value={formData.email}
@@ -414,11 +417,12 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-card-foreground">
+              <label htmlFor="address" className="text-sm font-medium text-card-foreground">
                 {"Street Address"} <span className="text-primary">*</span>
               </label>
               <div className="relative">
                 <Input
+                  id="address"
                   ref={addressInputRef}
                   type="text"
                   placeholder="730 South Loomis Street"
