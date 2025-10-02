@@ -237,18 +237,19 @@ export function AddressStep({ data, updateData, onNext, onBack }: Props) {
           }
         })
 
-        const fullAddress = `${streetNumber} ${route}`.trim()
+        const streetAddress = `${streetNumber} ${route}`.trim()
+        const fullAddressDisplay = `${streetAddress}, ${city}, ${state} ${zipCode}`.trim()
 
         setFormData((prev) => ({
           ...prev,
-          address: fullAddress,
+          address: fullAddressDisplay, // Display full address in the field
           city,
           state,
           zipCode,
         }))
 
         setShowAutocompleteTip(false)
-        validateAddress(fullAddress, city, state, zipCode)
+        validateAddress(streetAddress, city, state, zipCode)
       })
     } catch (error) {
       console.error("[v0] Error initializing autocomplete:", error)
