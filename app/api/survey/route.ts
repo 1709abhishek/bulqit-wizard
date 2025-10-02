@@ -15,7 +15,6 @@ export async function POST(request: Request) {
       firstName,
       lastName,
       email,
-      phone,
     } = body ?? {}
 
     if (!address || !firstName || !lastName || !email) {
@@ -25,10 +24,10 @@ export async function POST(request: Request) {
     const result = await sql<{
       id: string
     }[]>
-      `INSERT INTO survey_responses (
-        address, city, state, zip_code, services, future_services, first_name, last_name, email, phone
+      `INSERT INTO wizard_survey_responses (
+        address, city, state, zip_code, services, future_services, first_name, last_name, email
       ) VALUES (
-        ${address}, ${city ?? null}, ${state ?? null}, ${zipCode ?? null}, ${services ?? []}, ${futureServices ?? []}, ${firstName}, ${lastName}, ${email}, ${phone ?? null}
+        ${address}, ${city ?? null}, ${state ?? null}, ${zipCode ?? null}, ${services ?? []}, ${futureServices ?? []}, ${firstName}, ${lastName}, ${email}
       ) RETURNING id`;
 
     return NextResponse.json({ id: result[0].id }, { status: 201 })
