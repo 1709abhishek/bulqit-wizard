@@ -67,7 +67,7 @@ Built for Bulqit's Phase 1 launch, this signup wizard captures homeowner interes
 
 ### Database Schema
 
-\`\`\`typescript
+```typescript
 {
   firstName: string
   lastName: string
@@ -86,11 +86,11 @@ Built for Bulqit's Phase 1 launch, this signup wizard captures homeowner interes
   futureServices: string[]
   createdAt: timestamp
 }
-\`\`\`
+```
 
 ### Project Structure
 
-\`\`\`
+```
 app/
 ├── layout.tsx              # Root layout with metadata
 ├── page.tsx                # Home with SignupWizard
@@ -114,7 +114,7 @@ hooks/
 test/
 ├── signup-wizard.test.tsx  # Integration tests
 └── address-step.test.tsx   # Address validation tests
-\`\`\`
+```
 
 ## Setup
 
@@ -125,36 +125,36 @@ test/
 
 ### Environment Variables
 
-\`\`\`bash
+```bash
 # .env.local
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_key_here
-\`\`\`
+```
 
 **Note:** The `NEXT_PUBLIC_` prefix exposes the key client-side, which is required for Google Maps JavaScript API. Restrict your API key by HTTP referrer in Google Cloud Console.
 
 ### Installation
 
-\`\`\`bash
+```bash
 npm install
 npm run dev
 # Open http://localhost:3000
-\`\`\`
+```
 
 ### Testing
 
-\`\`\`bash
+```bash
 npm test              # Run test suite
 npm run test:ui       # Interactive test UI
-\`\`\`
+```
 
 **Testing Strategy:** Comprehensive tests have been written to fence future changes and ensure reliability. The test suite covers wizard flows, address validation, form interactions, and accessibility compliance.
 
 ### Production
 
-\`\`\`bash
+```bash
 npm run build
 npm start
-\`\`\`
+```
 
 ## Phase 2 Readiness
 
@@ -167,7 +167,7 @@ This codebase is architected for Phase 2 expansion:
 
 ### Database Structure (Phase 2)
 
-\`\`\`sql
+```sql
 -- Blocks table for service areas
 CREATE TABLE blocks (
   id SERIAL PRIMARY KEY,
@@ -188,7 +188,7 @@ CREATE TABLE block_services (
   min_neighbors_needed INTEGER,
   current_signups INTEGER
 );
-\`\`\`
+```
 
 ### Integration Points
 
@@ -245,7 +245,7 @@ Primary traffic source is Facebook/Google ads viewed on mobile devices. Desktop 
 
 Structured for analytics integration:
 
-\`\`\`typescript
+```typescript
 // Track step completion
 trackEvent('wizard_step_completed', {
   step: 'address',
@@ -257,7 +257,7 @@ trackEvent('services_selected', {
   count: 3,
   services: ['lawn_care', 'pool_maintenance', 'pest_control']
 })
-\`\`\`
+```
 
 ## Known Limitations
 
@@ -270,9 +270,9 @@ trackEvent('services_selected', {
 
 Optimized for Vercel deployment:
 
-\`\`\`bash
+```bash
 vercel --prod
-\`\`\`
+```
 
 Environment variables set in Vercel dashboard. Google Maps API key restricted to production domain.
 
